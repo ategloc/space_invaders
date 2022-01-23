@@ -1,6 +1,7 @@
 from classes import Shield, Enemy, Player, Speed, Projectile, Entity
 import pygame
 from random import choice
+from model_io import write_to_json, read_from_json
 
 spritesplaceholer = None
 
@@ -60,6 +61,7 @@ class Game():
         self.score = 0
         self.ongoing = True
         self.result = None
+        self.get_highscore()
         self.add_player(
             lifes=3,
             speed=Speed(4, 0),
@@ -253,12 +255,12 @@ class Game():
     def update_game_status(self):
         if len(self.enemies) == 0:
             self.ongoing = False
-            self.result = Player
+            self.result = True
             return True
 
         if self.player.lifes() < 1:
             self.ongoing = False
-            self.result = Enemy
+            self.result = False
             return True
 
         return False
@@ -269,3 +271,20 @@ class Game():
         self.enemy_shoot(shooting_enemy)
 
     def score_calc(self):
+        if self.gametick % 1000 == 0:
+            self.score -= self.gametick//1000
+
+    def get_highscore(self):
+        try:
+            path = open('highscore.json', 'r')
+            list_with_score = read_from_json(path)
+            self.highscore = list_with_score[0].get('highscore', 0)
+        except Exception:
+            path = open('highscore.json', 'w')
+            write_to_json(path, 0)
+            self.highscore = 0
+
+    def save_potential_highscore(self):
+        if self.score > self.highscore:
+            path = open('highscore.json', 'w')
+            write_to_json(path, self.score)

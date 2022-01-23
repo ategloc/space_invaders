@@ -21,12 +21,31 @@ def draw_game_rigth_side(screen: 'pygame.display', game: 'Game'):
         )
 
 
-def game_start_screen():
-    pygame.init()
-    pygame.font.init()
-    pygame.display.set_caption('Space Invaders')
-    width, height = 640, 512
-    screen = pygame.display.set_mode((width, height))
+def display_score(screen: 'pygame.display', game: 'Game'):
+    font = pygame.font.SysFont('timesnewroman', 32)
+    text_score = font.render('Score', False, (255, 255, 255))
+    text_score_number = font.render(str(game.score), False, (255, 255, 255))
+    text_highscore = font.render('Highscore', False, (255, 255, 255))
+    text_highscore_number = font.render(
+        str(game.highscore),
+        False,
+        (255, 255, 255)
+    )
+    text_lifes = font.render('Lifes:', False, (255, 255, 255))
+    text_lifes_number = font.render(
+        str(game.player.lifes()),
+        False,
+        (255, 255, 255)
+    )
+    screen.blit(text_score, (325, 130))
+    screen.blit(text_score_number, (325, 170))
+    screen.blit(text_highscore, (325, 30))
+    screen.blit(text_highscore_number, (325, 70))
+    screen.blit(text_lifes, (325, 400))
+    screen.blit(text_lifes_number, (325, 440))
+
+
+def game_start_screen(screen, width, height):
     start_text = 'Press ANY key to start!'
     font_head = pygame.font.SysFont('timesnewroman', 32)
     text_head = font_head.render('Space Invaders', False, (255, 255, 255))
@@ -53,39 +72,94 @@ def game_start_screen():
                 return screen
 
 
-def game_display(screen: 'pygame.display'):
-    game = Game((320, 512))
+def end_display(
+    screen: 'pygame.display',
+    width: int,
+    height: int,
+    result: bool,
+    score: int,
+    highscore: int
+):
+    waiting = 1
+    text_to_blit = []
+    font = pygame.font.SysFont('timesnewroman', 32)
+    font_half = pygame.font.SysFont('timesnewroman', 16)
+    if result:
+        result_str = 'You won!'
+    else:
+        result_str = "You lost!"
+    if score > highscore:
+        new_highcore_str = 'New highscore!'
+        old_highscore_str = 'Old highscore:'
+    else:
+        new_highcore_str = ''
+        old_highscore_str = 'Highscore:'
+    result_text = font.render(result_str, False, (255, 255, 255))
+    result_text_pos = result_text.get_rect(center=(320, 60))
+    text_to_blit.append((result_text, result_text_pos))
 
-    keys = [False, False, False, False]
+    score_text = font.render('Score:', False, (255, 255, 255))
+    text_to_blit.append((score_text, (90, 100)))
 
-    # 3 - Load images
-    # player = pygame.image.load("playerv2.png")
+    score_num_text = font.render(str(score), False, (255, 255, 255))
+    text_to_blit.append((score_num_text, (90, 140)))
 
-    # 4 - keep looping through
-    while game.ongoing:
-        game.gametick += 1
-        game.update_enemy_positions()
-        game.update_projectiles()
-        # 5 - clear the screen before drawing it again
+    highscore_text = font.render(old_highscore_str, False, (255, 255, 255))
+    text_to_blit.append((highscore_text, (90, 180)))
+
+    highscore_num_text = font.render(str(highscore), False, (255, 255, 255))
+    text_to_blit.append((highscore_num_text, (90, 220)))
+
+    start_text = 'Press ANY key to continue!'
+    text_start = font_half.render(start_text, True, (255, 255, 255))
+    text_start_pos = text_start.get_rect(center=(width/2, height - 50))
+    text_to_blit.append((text_start, text_start_pos))
+
+    new_highcore_text = font_half.render(
+        new_highcore_str,
+        False,
+        (255, 255, 255)
+    )
+    new_highcore_text_pos = new_highcore_text.get_rect(center=(320, 20))
+    blit_frames = 0
+
+    while waiting:
+        blit_frames += 1
         fill_with_black(screen)
-        # 6 - draw the screen elements
-        display_entitiies(screen, game.entities)
-        # for entity in game.entities:
-        #     screen.blit(entity.sprite(), (entity.position().both()))
-        pygame.draw.line(
-            screen,
-            (255, 255, 255,),
-            (game._width + 1, 0),
-            (game._width + 1, game._length)
-            )
-
-        # 7 - update the screen
+        for text in text_to_blit:
+            screen.blit(text[0], text[1])
+        if blit_frames % 75 < 50:
+            screen.blit(new_highcore_text, new_highcore_text_pos)
         pygame.display.flip()
-        # 8 - loop through the events
         for event in pygame.event.get():
             # check if the event is the X button
             if event.type == pygame.QUIT:
                 # if it is quit the game
+                pygame.quit()
+                exit(0)
+                return None
+            if event.type == pygame.KEYDOWN:
+                return screen
+
+
+def game_display(screen: 'pygame.display'):
+    game = Game((320, 512))
+
+    keys = [False, False, False, False]
+    while game.ongoing:
+        game.gametick += 1
+        game.update_enemy_positions()
+        game.update_projectiles()
+        game.score_calc()
+        fill_with_black(screen)
+        display_entitiies(screen, game.entities)
+        draw_game_rigth_side(screen, game)
+        display_score(screen, game)
+        # 7 - update the screen
+        pygame.display.flip()
+        # 8 - loop through the events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 exit(0)
             if event.type == pygame.KEYDOWN:
@@ -104,24 +178,28 @@ def game_display(screen: 'pygame.display'):
                 elif event.key in (K_RIGHT, K_d):
                     keys[3] = False
 
-        # Update the y position
-        # If the up button is pressed
         if keys[0]:
             game.player_shoot()
-        # Update x-position
-        # If the left key is pressed
         if keys[1]:
             if game.player.position().x() > 0:
                 game.player.move_right()
-        # If the right key is pressed
         if keys[3]:
             if game.player.position().x() < game._width - 16:
                 game.player.move_left()
 
         game.update_game_status()
-        # game.enemies_shoot()
+
+    game.save_potential_highscore()
+    return(game.result, game.score, game.highscore)
 
 
 if __name__ == '__main__':
-    screen = game_start_screen()
-    game_display(screen)
+    pygame.init()
+    pygame.font.init()
+    pygame.display.set_caption('Space Invaders')
+    width, height = 640, 512
+    screen = pygame.display.set_mode((width, height))
+    while True:
+        game_start_screen(screen, width, height)
+        result, score, highscore = game_display(screen)
+        end_display(screen, width, height, result, score, highscore)
