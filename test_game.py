@@ -1,5 +1,5 @@
 from game import Game, check_if_hit
-from classes import Enemy, Projectile, Player, Position, Speed
+from classes import Enemy, Projectile, Player, Speed
 
 
 def test_check_if_hit():
@@ -10,6 +10,7 @@ def test_check_if_hit():
     player._position.update_position(player._speed)
     assert check_if_hit(projectile, player) is False
 
+
 def test_check_if_hit2():
     player = Player(1, Speed(1, 0), 20, 0, None)
     projectile = Projectile(21, 0, Speed(0, 1), Player, None)
@@ -18,9 +19,11 @@ def test_check_if_hit2():
     # player._position.update_position(player._speed)
     # assert check_if_hit(projectile, player) is False
 
+
 def test_game():
     game = Game((640, 512))
     assert game
+
 
 def test_check_if_hit_2_projectiles():
     proj1 = Projectile(20, 20, Speed(0, -1), Player, None)

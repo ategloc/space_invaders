@@ -80,7 +80,8 @@ class moveable_Entity(Entity):
         position_x: int, position_y: int,
         sprite: "pygame.image.load()",
         width: int,
-            length: int) -> None:
+        length: int
+    ) -> None:
 
         super().__init__(position_x, position_y, sprite, width, length)
         self._speed = speed
@@ -89,7 +90,33 @@ class moveable_Entity(Entity):
         return (self._speed)
 
 
-class Player(moveable_Entity):
+class shooting_Entity(moveable_Entity):
+
+    def __init__(
+        self,
+        speed: 'Speed',
+        position_x: int, position_y: int,
+        sprite: "pygame.image.load()",
+        width: int,
+        length: int,
+        shoot_cooldown: int
+    ) -> None:
+
+        super().__init__(speed, position_x, position_y, sprite, width, length)
+        self._shoot_cooldown = shoot_cooldown
+        self._last_shot_tick = (-1) * shoot_cooldown
+
+    def shoot_cooldown(self):
+        return self._shoot_cooldown
+
+    def can_shoot(self, game_tick):
+        if game_tick - self.shoot_cooldown() > self._last_shot_tick:
+            self._last_shot_tick = int(game_tick)
+            return True
+        return False
+
+
+class Player(shooting_Entity):
     width = 16
     length = 8
 
@@ -98,12 +125,15 @@ class Player(moveable_Entity):
         lifes,
         speed: 'Speed',
         position_x: int, position_y: int,
-            sprite: "pygame.image.load()") -> None:
+        sprite: "pygame.image.load()",
+        shoot_cooldown: int
+    ) -> None:
         super().__init__(
             speed,
             position_x, position_y,
             sprite,
-            Player.width, Player.length)
+            Player.width, Player.length,
+            shoot_cooldown)
         self._lifes = lifes
 
     def take_hit(self):
@@ -119,7 +149,7 @@ class Player(moveable_Entity):
             pygame.image.load("bulletv2.png"))
 
     def lifes(self):
-        return self.lifes
+        return self._lifes
 
     def move_left(self):
         self.position().update_position(self.speed())
@@ -132,7 +162,7 @@ class Player(moveable_Entity):
             )
 
 
-class Enemy(moveable_Entity):
+class Enemy(shooting_Entity):
     width = 16
     length = 8
     speed = Speed(0, 0)
@@ -141,12 +171,15 @@ class Enemy(moveable_Entity):
         self,
         speed: 'Speed',
         position_x: int, position_y: int,
-            sprite: "pygame.image.load()") -> None:
+        sprite: "pygame.image.load()",
+        shoot_cooldown: int
+    ) -> None:
         super().__init__(
             speed,
             position_x, position_y,
             sprite,
-            Enemy.width, Enemy.length)
+            Enemy.width, Enemy.length,
+            shoot_cooldown)
         Enemy.speed = speed
 
     def take_hit(self):
@@ -184,18 +217,24 @@ class Projectile(moveable_Entity):
 
 class Shield(Entity):
 
-    sprite_high = None
-    sprite_mid = None
-    sprite_low = None
+    sprite_high = pygame.image.load("shieldv1yellow.png")
+    sprite_mid = pygame.image.load("shieldv1yellow.png")
+    sprite_low = pygame.image.load("shieldv1yellow.png")
+    width = 60
+    length = 30
 
     def __init__(self, position_x: int, position_y: int, health: int) -> None:
-        super().__init__(position_x, position_y, Shield.sprite_high)
+        super().__init__(
+            position_x, position_y,
+            Shield.sprite_high,
+            Shield.width, Shield.length
+            )
         self._health = health
         self._hp_start = health
 
     def update_sprite(self):
-        if self._health * 100 < Shield.hp_start * 60:
-            if self._health * 100 < Shield.hp_start * 30:
+        if self._health * 100 < self._hp_start * 60:
+            if self._health * 100 < self._hp_start * 30:
                 self._sprite = Shield.sprite_low
             else:
                 self._sprite = Shield.sprite_mid
