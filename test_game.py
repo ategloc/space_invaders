@@ -3,7 +3,7 @@ from classes import Enemy, Projectile, Player, Speed
 
 
 def test_check_if_hit():
-    player = Player(1, Speed(3, 0), 21, 0, None)
+    player = Player(1, Speed(3, 0), 21, 0, None, 0)
     projectile = Projectile(21, 0, Speed(0, 1), Player, None)
     # assert player._position == projectile._position
     assert check_if_hit(projectile, player) is True
@@ -12,7 +12,7 @@ def test_check_if_hit():
 
 
 def test_check_if_hit2():
-    player = Player(1, Speed(1, 0), 20, 0, None)
+    player = Player(1, Speed(1, 0), 20, 0, None, 0)
     projectile = Projectile(21, 0, Speed(0, 1), Player, None)
     # assert player._position == projectile._position
     assert check_if_hit(projectile, player) is True

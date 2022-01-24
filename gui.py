@@ -4,15 +4,27 @@ from game import Game
 
 
 def fill_with_black(screen):
+    """
+    resets the screen by filling it with black
+    """
+
     screen.fill((0, 0, 0))
 
 
 def display_entitiies(screen, list_of_entities):
+    """
+    display all entities in gives list on given screen
+    """
+
     for entity in list_of_entities:
         screen.blit(entity.sprite(), (entity.position().both()))
 
 
 def draw_game_rigth_side(screen: 'pygame.display', game: 'Game'):
+    """
+    draws a line that divides game from gamestate info
+    """
+
     pygame.draw.line(
         screen,
         (255, 255, 255,),
@@ -22,6 +34,10 @@ def draw_game_rigth_side(screen: 'pygame.display', game: 'Game'):
 
 
 def display_score(screen: 'pygame.display', game: 'Game'):
+    """
+    displays gameinfo - right side of game's window
+    """
+
     font = pygame.font.SysFont('timesnewroman', 32)
     text_score = font.render('Score', False, (255, 255, 255))
     text_score_number = font.render(str(game.score), False, (255, 255, 255))
@@ -46,6 +62,10 @@ def display_score(screen: 'pygame.display', game: 'Game'):
 
 
 def game_start_screen(screen, width, height):
+    """
+    displays start screen for the game
+    """
+
     start_text = 'Press ANY key to start!'
     font_head = pygame.font.SysFont('timesnewroman', 32)
     text_head = font_head.render('Space Invaders', False, (255, 255, 255))
@@ -80,6 +100,10 @@ def end_display(
     score: int,
     highscore: int
 ):
+    """
+    displays end screen after a game - shows score, highscore
+    """
+
     waiting = 1
     text_to_blit = []
     font = pygame.font.SysFont('timesnewroman', 32)
@@ -138,11 +162,17 @@ def end_display(
                 pygame.quit()
                 exit(0)
                 return None
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN and blit_frames > 50:
                 return screen
 
 
 def game_display(screen: 'pygame.display'):
+    """
+    initializes a game, displays and runs the game
+
+    reads key inputs from user
+    """
+
     game = Game((320, 512))
 
     keys = [False, False, False, False]
@@ -155,9 +185,7 @@ def game_display(screen: 'pygame.display'):
         display_entitiies(screen, game.entities)
         draw_game_rigth_side(screen, game)
         display_score(screen, game)
-        # 7 - update the screen
         pygame.display.flip()
-        # 8 - loop through the events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -182,10 +210,10 @@ def game_display(screen: 'pygame.display'):
             game.player_shoot()
         if keys[1]:
             if game.player.position().x() > 0:
-                game.player.move_right()
+                game.player.move_left()
         if keys[3]:
             if game.player.position().x() < game._width - 16:
-                game.player.move_left()
+                game.player.move_right()
 
         game.update_game_status()
 
@@ -194,6 +222,12 @@ def game_display(screen: 'pygame.display'):
 
 
 if __name__ == '__main__':
+    """
+    run function
+
+    inits an window and run through displays
+    """
+
     pygame.init()
     pygame.font.init()
     pygame.display.set_caption('Space Invaders')
