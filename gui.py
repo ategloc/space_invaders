@@ -176,7 +176,9 @@ def game_display(screen: 'pygame.display'):
     game = Game((320, 512))
 
     keys = [False, False, False, False]
+    clock = pygame.time.Clock()
     while game.ongoing:
+        clock.tick(30)
         game.gametick += 1
         game.update_enemy_positions()
         game.update_projectiles()
