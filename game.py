@@ -404,6 +404,7 @@ class Game():
         """
 
         if len(self.enemies) == 0:
+            self.score += 1000
             self.ongoing = False
             self.result = True
             return True

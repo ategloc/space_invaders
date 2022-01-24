@@ -175,19 +175,21 @@ def game_display(screen: 'pygame.display'):
 
     game = Game((320, 512))
 
-    keys = [False, False, False, False]
+    keys = [False, False, False]
     clock = pygame.time.Clock()
     while game.ongoing:
-        clock.tick(30)
+        clock.tick(60)
         game.gametick += 1
         game.update_enemy_positions()
         game.update_projectiles()
         game.score_calc()
+
         fill_with_black(screen)
         display_entitiies(screen, game.entities)
         draw_game_rigth_side(screen, game)
         display_score(screen, game)
         pygame.display.flip()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -198,7 +200,7 @@ def game_display(screen: 'pygame.display'):
                 elif event.key in (K_LEFT, K_a):
                     keys[1] = True
                 elif event.key in (K_RIGHT, K_d):
-                    keys[3] = True
+                    keys[2] = True
 
             if event.type == pygame.KEYUP:
                 if event.key in (K_UP, K_w, K_SPACE):
@@ -206,14 +208,14 @@ def game_display(screen: 'pygame.display'):
                 elif event.key in (K_LEFT, K_a):
                     keys[1] = False
                 elif event.key in (K_RIGHT, K_d):
-                    keys[3] = False
+                    keys[2] = False
 
         if keys[0]:
             game.player_shoot()
         if keys[1]:
             if game.player.position().x() > 0:
                 game.player.move_left()
-        if keys[3]:
+        if keys[2]:
             if game.player.position().x() < game._width - 16:
                 game.player.move_right()
 
