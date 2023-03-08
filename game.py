@@ -1,6 +1,8 @@
-from classes import Shield, Enemy, Player, Speed, Projectile, Entity
-import pygame
 from random import choice
+
+import pygame
+
+from classes import Shield, Enemy, Player, Speed, Projectile, Entity
 from model_io import write_to_json, read_from_json
 
 spritesplaceholer = None
@@ -9,7 +11,7 @@ spritesplaceholer = None
 def check_if_hit(projectile: "Projectile", entity: "Entity"):
     """
     checks if a projectile is (at least partially)
-    in an entity (Enenmy, Shield, Player or Entity)
+    in an entity (Enemy, Shield, Player or Entity)
     """
 
     proj = (
@@ -22,29 +24,24 @@ def check_if_hit(projectile: "Projectile", entity: "Entity"):
         entity.position().x(), entity.position().x() + entity.width,
         entity.position().y(), entity.position().y() + entity.length
     )
-    righter = None
-    lefter = None
-    lower = None
-    higher = None
-    if (proj[0] >= target[0]):
+
+    if proj[0] >= target[0]:
         righter = proj
         lefter = target
     else:
         righter = target
         lefter = proj
-    if (proj[2] >= target[2]):
+    if proj[2] >= target[2]:
         lower = proj
         higher = target
     else:
         lower = target
         higher = proj
-    mid_x = (righter[0] + lefter[1])/2
-    mid_y = (lower[2] + higher[3])/2
+    mid_x = (righter[0] + lefter[1]) / 2
+    mid_y = (lower[2] + higher[3]) / 2
     if (
-        mid_x > target[0]
-        and mid_x < target[1]
-        and mid_y > target[2]
-        and mid_y < target[3]
+            target[0] < mid_x < target[1]
+            and target[2] < mid_y < target[3]
     ):
         return True
     return False
@@ -62,7 +59,7 @@ def load_sprites():
     Player.projectile_sprite = pygame.image.load('sprites/bulletv2.png')
 
 
-class Game():
+class Game:
     """
     Class Game. Contains attributes:
     :attrib name: _width
@@ -113,13 +110,15 @@ class Game():
     def __init__(self, win_resolution) -> None:
         """
         Parameters:
-        :param name: win_resolution
-        :param type: tuple(int, int)
+        :param win_resolution: win_resolution
+        :win_resolution type: tuple(int, int)
 
         initializes all lists and variables needed for class to work,
         spawns four rows of enemies and a row of shields
         """
 
+        self.highscore = None
+        self.player = None
         self._width = win_resolution[0]
         self._length = win_resolution[1]
         self.gametick = 0
@@ -151,7 +150,7 @@ class Game():
                 gap=16,
                 sprite=pygame.image.load("sprites/enemy2v2.png"),
                 shoot_cooldown=80
-                )
+            )
         for i in range(2):
             self.add_row_of_enemies(
                 height=32 + i * 32,
@@ -160,7 +159,7 @@ class Game():
                 gap=16,
                 sprite=pygame.image.load("sprites/enemy1v2.png"),
                 shoot_cooldown=80
-                )
+            )
         self.add_row_of_shields(
             height=self._length - 120,
             top_left_cord=30,
@@ -177,7 +176,7 @@ class Game():
         self.player = Player(
             lifes,
             speed,
-            self._width//2,
+            self._width // 2,
             self._length - Player.length,
             sprite,
             shoot_cooldown)
@@ -220,7 +219,7 @@ class Game():
 
     def enemy_shoot(self, enemy: 'Enemy'):
         """
-        makes a enemy shoot if it is allowed to
+        makes an enemy shoot if it is allowed to
         """
 
         if enemy.can_shoot(self.gametick):
@@ -229,21 +228,22 @@ class Game():
             self.entities.append(curr_projectile)
             self.projectiles_team_enemy.append(curr_projectile)
 
-    def update_position(self, entity):
+    @staticmethod
+    def update_position(entity):
         """
-        updates position of a entity
+        updates position of an entity
         """
 
         entity.position().update_position(entity.speed())
 
     def add_row_of_enemies(
-        self,
-        height,
-        top_left_cord_x,
-        amount,
-        gap,
-        sprite,
-        shoot_cooldown
+            self,
+            height,
+            top_left_cord_x,
+            amount,
+            gap,
+            sprite,
+            shoot_cooldown
     ):
         """
         adds a row of enemies
@@ -293,10 +293,10 @@ class Game():
                 # print(enemy.position().x())
                 enemy.position().update_position(Enemy.speed)
                 if (
-                    (enemy.position().x() + enemy.width == self._width)
-                    or
-                    (enemy.position().x() == 0)
-                        ):
+                        (enemy.position().x() + enemy.width == self._width)
+                        or
+                        (enemy.position().x() == 0)
+                ):
                     # print(enemy.position().x() + enemy.width)
                     # print(enemy.width)
                     change_dir = True
@@ -360,7 +360,7 @@ class Game():
 
     def player_hit(self, projectile):
         """
-        manages player and projectile if they are in eachother
+        manages player and projectile if they are in each other
         """
 
         self.remove_projectile(projectile)
@@ -373,7 +373,6 @@ class Game():
         """
 
         for projectile in self.projectiles:
-            hitable_projectiles = []
 
             if projectile.team() == Player:
                 hitable_projectiles = self.projectiles_team_enemy
@@ -387,10 +386,10 @@ class Game():
                 if check_if_hit(projectile, self.player):
                     self.player_hit(projectile)
 
-            for oposing_projectile in hitable_projectiles:
-                if check_if_hit(projectile, oposing_projectile):
+            for opposing_projectile in hitable_projectiles:
+                if check_if_hit(projectile, opposing_projectile):
                     self.remove_projectile(projectile)
-                    self.remove_projectile(oposing_projectile)
+                    self.remove_projectile(opposing_projectile)
 
             for shield in self.shields:
                 if check_if_hit(projectile, shield):
@@ -430,7 +429,7 @@ class Game():
         """
 
         if self.gametick % 1000 == 0:
-            self.score -= self.gametick//1000
+            self.score -= self.gametick // 1000
 
     def get_highscore(self):
         """
@@ -441,7 +440,7 @@ class Game():
             path = open('highscore.json', 'r')
             list_with_score = read_from_json(path)
             self.highscore = list_with_score[0].get('highscore', 0)
-        except Exception:
+        except OSError:
             path = open('highscore.json', 'w')
             write_to_json(path, 0)
             self.highscore = 0

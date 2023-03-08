@@ -1,7 +1,7 @@
 import pygame
 
 
-class Position():
+class Position:
     """
     Class Position. Contains attributes:
     :attrib name: _positionx
@@ -29,12 +29,12 @@ class Position():
         self._positionx += speed.right()
         self._positiony += speed.down()
 
-    def both(self) -> str:
+    def both(self) -> tuple[int, int]:
         """
         returns both coords of position
         """
 
-        return (self._positionx, self._positiony)
+        return self._positionx, self._positiony
 
     def x(self):
         """
@@ -51,7 +51,7 @@ class Position():
         return self._positiony
 
 
-class Speed():
+class Speed:
     """
     Class Position. Contains attributes:
     :attrib name: right
@@ -89,7 +89,7 @@ class Speed():
         return self._right
 
 
-class Entity():
+class Entity:
     """
     Class Entity. Contains attributes:
     :attrib name: _position
@@ -141,31 +141,31 @@ class Entity():
 
     def position(self):
         """
-        returns a instance of position of the entity
+        returns an instance of position of the entity
         """
 
-        return (self._position)
+        return self._position
 
     def sprite(self):
         """
         returns sprite of the entity
         """
 
-        return (self._sprite)
+        return self._sprite
 
     def width(self):
         """
         returns width of the entity
         """
 
-        return (self._width)
+        return self._width
 
     def length(self):
         """
         returns length of entity
         """
 
-        return(self._width)
+        return self._width
 
 
 class moveable_Entity(Entity):
@@ -217,7 +217,7 @@ class moveable_Entity(Entity):
         :param name: length
         :param type: int
 
-        inits an moving entity
+        inits a moving entity
         """
 
         super().__init__(position_x, position_y, sprite, width, length)
@@ -228,7 +228,7 @@ class moveable_Entity(Entity):
         returns speed of the entity
         """
 
-        return (self._speed)
+        return self._speed
 
 
 class shooting_Entity(moveable_Entity):
@@ -290,7 +290,7 @@ class shooting_Entity(moveable_Entity):
         :param name: shoot_cooldown
         :param type: int
 
-        inits an shooting an moving entity
+        inits a shooting and moving entity
         """
 
         super().__init__(speed, position_x, position_y, sprite, width, length)
@@ -377,7 +377,7 @@ class Player(shooting_Entity):
         :param name: shoot_cooldown
         :param type: int
 
-        inits an player
+        inits a player
         """
 
         super().__init__(
@@ -428,11 +428,12 @@ class Player(shooting_Entity):
         """
         self.position().update_position(
             Speed(
-                (self.speed()._right)*(-1), 0
+                self.speed()._right * (-1), 0
                 )
             )
 
 
+# noinspection GrazieInspection
 class Enemy(shooting_Entity):
     """
     Class Enemy. Contains attributes:
@@ -493,7 +494,8 @@ class Enemy(shooting_Entity):
             shoot_cooldown)
         Enemy.speed = speed
 
-    def take_hit(self):
+    @staticmethod
+    def take_hit():
         """
         returns True as enemy has 1 health
         """
@@ -612,7 +614,7 @@ class Shield(Entity):
         :param name: health
         :param type: int
 
-        inits an projectile
+        inits a projectile
         """
 
         super().__init__(
@@ -620,12 +622,13 @@ class Shield(Entity):
             Shield.sprite_high,
             Shield.width, Shield.length
             )
+        self._sprite = Shield.sprite_high
         self._health = health
         self._hp_start = health
 
     def update_sprite(self):
         """
-        updates shield's sprite regarding it's current hp
+        updates shield's sprite regarding its current hp
         """
         if self._health * 100 < self._hp_start * 60:
             if self._health * 100 < self._hp_start * 30:
@@ -633,7 +636,7 @@ class Shield(Entity):
             else:
                 self._sprite = Shield.sprite_mid
         else:
-            self._spite = Shield.sprite_high
+            pass
 
     def take_hit(self):
         """

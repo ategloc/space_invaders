@@ -222,7 +222,7 @@ def game_display(screen: 'pygame.display'):
         game.update_game_status()
 
     game.save_potential_highscore()
-    return(game.result, game.score, game.highscore)
+    return game.result, game.score, game.highscore
 
 
 if __name__ == '__main__':
